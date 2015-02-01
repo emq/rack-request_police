@@ -1,5 +1,4 @@
 require 'benchmark'
-require 'oj'
 
 describe "Simple benchmark", type: :request do
   let(:repeat) { 10_000 }

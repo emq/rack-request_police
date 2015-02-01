@@ -3,6 +3,7 @@ require 'sinatra/base'
 require 'rack/test'
 require 'timecop'
 require 'redis'
+require 'oj'
 
 RSpec.configure do |config|
   config.include Rack::Test::Methods
