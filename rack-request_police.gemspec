@@ -28,4 +28,5 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'timecop', '~> 0.7.1'
   spec.add_development_dependency 'redis', '~> 3.2.0'
   spec.add_development_dependency 'oj', '~> 2.11.4'
+  spec.add_development_dependency 'coveralls', '~> 0.7.8'
 end

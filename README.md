@@ -1,5 +1,10 @@
 # Rack::RequestPolice
 
+[![Code Climate](https://codeclimate.com/github/emq/rack-request_police/badges/gpa.svg)](https://codeclimate.com/github/emq/rack-request_police)
+[![Build Status](https://travis-ci.org/emq/rack-request_police.svg)](https://travis-ci.org/emq/rack-request_police)
+[![Coverage Status](https://coveralls.io/repos/emq/rack-request_police/badge.svg)](https://coveralls.io/r/emq/rack-request_police)
+[![Code Climate](https://codeclimate.com/github/emq/rack-request_police/badges/gpa.svg)](https://codeclimate.com/github/emq/rack-request_police)
+
 Rack middleware for logging selected request for further investigation / analyze.
 
 Features:

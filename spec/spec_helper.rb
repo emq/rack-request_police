@@ -1,3 +1,6 @@
+require 'coveralls'
+Coveralls.wear!
+
 require_relative '../lib/rack/request_police'
 require 'sinatra/base'
 require 'rack/test'
