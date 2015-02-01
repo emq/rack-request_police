@@ -15,7 +15,7 @@ describe "My Middleware", type: :request do
 
     it "logs request without query params" do
       expect_any_instance_of(DummyStorage).to receive(:log_request)
-        .with(url: "http://example.org/", ip: "127.0.0.1", method: "get", time: Time.now.to_i)
+        .with('url' => "http://example.org/", 'ip' => "127.0.0.1", 'method' => "get", 'time' => Time.now.to_i)
 
       get '/'
 
@@ -24,7 +24,7 @@ describe "My Middleware", type: :request do
 
     it "logs request with query params" do
       expect_any_instance_of(DummyStorage).to receive(:log_request)
-        .with(url: "http://example.org/?what-the&hell=", ip: "127.0.0.1", method: "get", time: Time.now.to_i)
+        .with('url' => "http://example.org/?what-the&hell=", 'ip' => "127.0.0.1", 'method' => "get", 'time' => Time.now.to_i)
 
       get '/?what-the&hell='
 
@@ -51,7 +51,7 @@ describe "My Middleware", type: :request do
 
     it "logs post request with request data" do
       expect_any_instance_of(DummyStorage).to receive(:log_request)
-        .with(url: "http://example.org/form", ip: "127.0.0.1", method: "post", time: Time.now.to_i, data: 'user[name]=john&user[email]=john%40test.com')
+        .with('url' => "http://example.org/form", 'ip' => "127.0.0.1", 'method' => "post", 'time' => Time.now.to_i, 'data' => 'user[name]=john&user[email]=john%40test.com')
 
       post '/form', { user: { name: 'john', email: 'john@test.com' } }
 
@@ -70,7 +70,7 @@ describe "My Middleware", type: :request do
 
     it "logs patch request with request data" do
       expect_any_instance_of(DummyStorage).to receive(:log_request)
-        .with(url: "http://example.org/update", ip: "127.0.0.1", method: "patch", time: Time.now.to_i, data: 'user[name]=john')
+        .with('url' => "http://example.org/update", 'ip' => "127.0.0.1", 'method' => "patch", 'time' => Time.now.to_i, 'data' => 'user[name]=john')
 
       patch '/update', { user: { name: 'john' } }
 
@@ -89,7 +89,7 @@ describe "My Middleware", type: :request do
 
     it "logs delete request with request data" do
       expect_any_instance_of(DummyStorage).to receive(:log_request)
-        .with(url: "http://example.org/destroy", ip: "127.0.0.1", method: "delete", time: Time.now.to_i, data: 'user[id]=1')
+        .with('url' => "http://example.org/destroy", 'ip' => "127.0.0.1", 'method' => "delete", 'time' => Time.now.to_i, 'data' => 'user[id]=1')
 
       delete '/destroy', { user: { id: 1 } }
 
@@ -116,7 +116,7 @@ describe "My Middleware", type: :request do
 
     it "logs matching queries" do
       expect_any_instance_of(DummyStorage).to receive(:log_request)
-        .with(url: "http://example.org/user", ip: "127.0.0.1", method: "get", time: Time.now.to_i)
+        .with('url' => "http://example.org/user", 'ip' => "127.0.0.1", 'method' => "get", 'time' => Time.now.to_i)
 
       get '/user'
 
@@ -141,7 +141,7 @@ describe "My Middleware", type: :request do
 
     it "logs matching queries" do
       expect_any_instance_of(DummyStorage).to receive(:log_request)
-        .with(url: "http://example.org/user?id=1", ip: "127.0.0.1", method: "get", time: Time.now.to_i)
+        .with('url' => "http://example.org/user?id=1", 'ip' => "127.0.0.1", 'method' => "get", 'time' => Time.now.to_i)
 
       get '/user?id=1'
 

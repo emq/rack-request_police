@@ -2,6 +2,7 @@ require_relative '../lib/rack/request_police'
 require 'sinatra/base'
 require 'rack/test'
 require 'timecop'
+require 'redis'
 
 RSpec.configure do |config|
   config.include Rack::Test::Methods
@@ -22,3 +23,6 @@ end
 class DummyStorage < Rack::RequestPolice::Storage::Base
   def log_request(hash); end
 end
+
+REDIS_OPTIONS = { url: "redis://localhost/15", namespace: "rack-request-police" }
+REDIS = Redis.new(REDIS_OPTIONS)

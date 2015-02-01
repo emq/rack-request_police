@@ -11,27 +11,24 @@ module Rack
       end
 
       def call(env)
-        # puts "ENV"
-        # puts env
-        # puts  # POST DATA
-# QUERY_STRING"=>"", "PATH_INFO = "/url"
- # "REQUEST_METHOD"=>"POST" / "GET"
- # "REMOTE_ADDR"=>"127.0.0.1", "HTTP_HOST"=>"example.org"
-
-
         if @method.include?(env['REQUEST_METHOD'].downcase.to_sym)
 
-          full_url = (env['HTTPS'] == 'on' ? 'https://' : 'http://') + env['HTTP_HOST'] + env['PATH_INFO'] + (env['QUERY_STRING'].empty? ? '' : '?' +env['QUERY_STRING'])
+          full_url = ''
+          full_url << (env['HTTPS'] == 'on' ? 'https://' : 'http://')
+          full_url << env['HTTP_HOST'] << env['PATH_INFO']
+          full_url << '?' << env['QUERY_STRING'] unless env['QUERY_STRING'].empty?
 
           if !@regex || full_url =~ @regex
-            request_params = {url: full_url,
-              ip: env['REMOTE_ADDR'],
-              method: env['REQUEST_METHOD'].downcase,
-              time: Time.now.to_i}
+            request_params = {
+              'url'    => full_url,
+              'ip'     => env['REMOTE_ADDR'],
+              'method' => env['REQUEST_METHOD'].downcase,
+              'time'   => Time.now.to_i
+            }
 
-            request_params.merge!(data: env['rack.input'].gets) if %w(POST PATCH DELETE).include?(env['REQUEST_METHOD'])
-              # puts request_params
-
+            if %w(POST PATCH DELETE).include?(env['REQUEST_METHOD'])
+              request_params.merge!('data' => env['rack.input'].gets)
+            end
             @storage.log_request(request_params)
           end
         end
