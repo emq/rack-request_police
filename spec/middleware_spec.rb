@@ -1,13 +1,16 @@
 require 'spec_helper'
 
 describe "My Middleware", type: :request do
-  before { Timecop.freeze }
+  before do
+    Timecop.freeze
+    Rack::RequestPolice.storage = DummyStorage.new
+  end
   after  { Timecop.return }
 
   context "logging all requests" do
     let(:app){
       Sinatra.new do
-        use(Rack::RequestPolice::Middleware, storage: DummyStorage.new)
+        use(Rack::RequestPolice::Middleware)
         get '/' do
         end
       end
@@ -35,7 +38,7 @@ describe "My Middleware", type: :request do
   context "logging only POST requests" do
     let(:app){
       Sinatra.new do
-        use(Rack::RequestPolice::Middleware, storage: DummyStorage.new, method: [:post])
+        use(Rack::RequestPolice::Middleware, method: [:post])
         get '/' do
         end
         post '/form' do
@@ -62,7 +65,7 @@ describe "My Middleware", type: :request do
   context "logging PATCH requests" do
     let(:app){
       Sinatra.new do
-        use(Rack::RequestPolice::Middleware, storage: DummyStorage.new, method: [:patch])
+        use(Rack::RequestPolice::Middleware, method: [:patch])
         patch '/update' do
         end
       end
@@ -81,7 +84,7 @@ describe "My Middleware", type: :request do
   context "logging DELETE requests" do
     let(:app){
       Sinatra.new do
-        use(Rack::RequestPolice::Middleware, storage: DummyStorage.new, method: [:delete])
+        use(Rack::RequestPolice::Middleware, method: [:delete])
         delete '/destroy' do
         end
       end
@@ -100,7 +103,7 @@ describe "My Middleware", type: :request do
   context "logging requests via regex expression" do
     let(:app){
       Sinatra.new do
-        use(Rack::RequestPolice::Middleware, storage: DummyStorage.new, match: /user/)
+        use(Rack::RequestPolice::Middleware, match: /user/)
         get '/user' do
         end
         get '/account' do
@@ -127,7 +130,7 @@ describe "My Middleware", type: :request do
   context "logging request via regex expression (with params)" do
     let(:app){
       Sinatra.new do
-        use(Rack::RequestPolice::Middleware, storage: DummyStorage.new, match: /user\?id=1/)
+        use(Rack::RequestPolice::Middleware, match: /user\?id=1/)
         get '/user' do
         end
       end
@@ -152,12 +155,13 @@ describe "My Middleware", type: :request do
   context "logging without storage" do
     let(:app){
       Sinatra.new do
-        use(Rack::RequestPolice::Middleware, storage: nil)
+        use(Rack::RequestPolice::Middleware)
       end
     }
 
     it 'raises an error' do
-      expect { get '/' }.to raise_error(Rack::RequestPolice::Middleware::NoStorageFound)
+      Rack::RequestPolice.storage = nil
+      expect { get '/' }.to raise_error(Rack::RequestPolice::NoStorageFound)
     end
   end
 end

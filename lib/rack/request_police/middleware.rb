@@ -5,9 +5,9 @@ module Rack
 
       def initialize(app, options = {})
         @app = app
-        @storage = options[:storage] || fail(NoStorageFound)
         @method = options[:method] || [:get, :post, :delete, :patch]
         @regex = options[:match]
+        @storage = ::Rack::RequestPolice.storage
       end
 
       def call(env)
