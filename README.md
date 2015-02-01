@@ -1,6 +1,13 @@
 # Rack::RequestPolice
 
-TODO: Write a gem description
+Rack middleware for logging selected request for further investigation / analyze.
+
+Features:
+
+- filter requests by method (get/post/patch/delete) and/or regular expression
+- log requests into storage of your choice (at the moment redis supported)
+
+Work in progress.
 
 ## Installation
 
@@ -20,11 +27,11 @@ Or install it yourself as:
 
 ## Usage
 
-TODO: Write usage instructions here
+Work in progress.
 
 ## Contributing
 
-1. Fork it ( https://github.com/[my-github-username]/rack-request_police/fork )
+1. Fork it ( https://github.com/emq/rack-request_police/fork )
 2. Create your feature branch (`git checkout -b my-new-feature`)
 3. Commit your changes (`git commit -am 'Add some feature'`)
 4. Push to the branch (`git push origin my-new-feature`)
