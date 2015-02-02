@@ -1,9 +1,12 @@
+require 'rack/request_police/web_helpers'
 require 'sinatra/base'
 require 'erb'
 
 module Rack
   module RequestPolice
     class Web < Sinatra::Base
+      helpers WebHelpers
+
       set :root, ::File.expand_path(::File.dirname(__FILE__) + "/../../../web")
 
       get '/' do
