@@ -1,10 +1,46 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>RequestPolice</title>
+    <title><%= environment_name %> RequestPolice</title>
     <link rel="stylesheet" type="text/css" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
+    <style type="text/css">
+    pre {
+      display: none;
+    }
+    </style>
+    <script type="text/javascript">
+      function ready(fn){
+        if (document.readyState != 'loading'){
+          fn();
+        } else {
+          document.addEventListener('DOMContentLoaded', fn);
+        }
+      }
+
+      ready(function(){
+        var elements = document.querySelectorAll('a');
+          Array.prototype.forEach.call(elements, function(el){
+          el.addEventListener('click', function(e){
+            var pre = this.nextSibling;
+            if (pre.style.display == 'block'){
+              pre.style.display ='none';
+            } else {
+              pre.style.display = 'block';
+            }
+            e.preventDefault();
+          });
+        });
+      });
+    </script>
   </head>
   <body>
+    <nav class="navbar navbar-default">
+      <div class="container">
+        <div class="navbar-header">
+          <a href="/" class="navbar-brand"><%= environment_name %> Rack::RequestPolice v<%= Rack::RequestPolice::VERSION %></a>
+        </div>
+      </div>
+    </nav>
     <div class="container">
       <div class="row">
         <div class="col-md-12">
@@ -25,8 +61,7 @@
                 <td><%= log.url %></td>
                 <td>
                   <% if log.data.present? %>
-                    <a href='#'>details</a>
-                    <pre>
+                    <a href='#'>details</a><pre>
                       <%= log.data.inspect %>
                     </pre>
                   <% end %>
@@ -35,6 +70,30 @@
               <% end %>
             </tbody>
           </table>
+
+          <% if @total_size > @count %>
+            <ul class="pagination pull-right">
+              <li class="<%= 'disabled' if @current_page == 1 %>">
+                <a href="<%= root_path %>?page=1">&laquo;</a>
+              </li>
+              <% if @current_page > 1 %>
+                <li>
+                  <a href="<%= root_path %>?<%= qparams(page: @current_page - 1) %>"><%= @current_page - 1 %></a>
+                </li>
+              <% end %>
+              <li class="disabled">
+                <a href="<%= root_path %>?<%= qparams(page: @current_page) %>"><%= @current_page %></a>
+              </li>
+              <% if @total_size > @current_page * @count %>
+                <li>
+                  <a href="<%= root_path %>?<%= qparams(page: @current_page + 1) %>"><%= @current_page + 1 %></a>
+                </li>
+              <% end %>
+              <li class="<%= 'disabled' if @total_size <= @current_page * @count %>">
+                <a href="<%= root_path %>?<%= qparams(page: (@total_size.to_f / @count).ceil) %>">&raquo;</a>
+              </li>
+            </ul>
+          <% end %>
         </div>
       </div>
     </div>
