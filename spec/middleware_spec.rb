@@ -188,6 +188,12 @@ describe "My Middleware", type: :request do
   end
 
   context "logging without storage" do
+    before do
+      Rack::RequestPolice.configure do |c|
+        c.storage = nil
+      end
+    end
+
     let(:app){
       Sinatra.new do
         use(Rack::RequestPolice::Middleware)
@@ -195,7 +201,6 @@ describe "My Middleware", type: :request do
     }
 
     it 'raises an error' do
-      Rack::RequestPolice.storage = nil
       get '/'
       expect(last_response.status).to eq 500
     end
