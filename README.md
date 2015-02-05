@@ -32,7 +32,35 @@ Or install it yourself as:
 
 ## Usage
 
-Work in progress.
+### Rails
+
+Add do your `application.rb` / environment config:
+
+``` ruby
+Application.configure do
+  # ...
+  config.middleware.use Rack::RequestPolice::Middleware
+end
+```
+
+Configure middleware using initializer (eg. `config/initializers/request_police.rb`).
+
+``` ruby
+Rack::RequestPolice.configure do |config|
+  # For the time being only redis storage if provided, but you can hook up
+  # any storage of your choice as long it responds to log_request and page methods
+  # see Storage::Base and Storage::Redis for more references
+  config.storage = Rack::RequestPolice::Storage::Redis.new(host: 'localhost', port: 6379)
+
+  # Regular expression that will be matched against request uri
+  # Nil by default (logs all requests)
+  config.regex = /some-url/
+
+  # array of methods that should be logged (all four by default)
+  # requests not included in this list will be ignored
+  config.method = [:get, :post, :delete, :patch]
+end
+```
 
 ## Contributing
 

@@ -3,21 +3,18 @@ module Rack
     class Middleware
       class NoStorageFound < StandardError; end
 
-      def initialize(app, options = {})
+      def initialize(app)
         @app = app
-        @method = options[:method] || [:get, :post, :delete, :patch]
-        @regex = options[:match]
       end
 
       def call(env)
-        if @method.include?(env['REQUEST_METHOD'].downcase.to_sym)
-
+        if ::Rack::RequestPolice.method.include?(env['REQUEST_METHOD'].downcase.to_sym)
           full_url = ''
           full_url << (env['HTTPS'] == 'on' ? 'https://' : 'http://')
           full_url << env['HTTP_HOST'] << env['PATH_INFO']
           full_url << '?' << env['QUERY_STRING'] unless env['QUERY_STRING'].empty?
 
-          if !@regex || full_url =~ @regex
+          if !::Rack::RequestPolice.regex || full_url =~ ::Rack::RequestPolice.regex
             request_params = {
               'url'    => full_url,
               'ip'     => env['REMOTE_ADDR'],

@@ -3,7 +3,12 @@ require 'spec_helper'
 describe "My Middleware", type: :request do
   before do
     Timecop.freeze
-    Rack::RequestPolice.storage = DummyStorage.new
+
+    Rack::RequestPolice.configure do |c|
+      c.storage = DummyStorage.new
+      c.regex = nil
+      c.method = [:get, :post, :delete, :patch]
+    end
   end
   after  { Timecop.return }
 
@@ -36,9 +41,15 @@ describe "My Middleware", type: :request do
   end
 
   context "logging only POST requests" do
+    before do
+      Rack::RequestPolice.configure do |c|
+        c.method = [:post]
+      end
+    end
+
     let(:app){
       Sinatra.new do
-        use(Rack::RequestPolice::Middleware, method: [:post])
+        use(Rack::RequestPolice::Middleware)
         get '/' do
         end
         post '/form' do
@@ -63,9 +74,15 @@ describe "My Middleware", type: :request do
   end
 
   context "logging PATCH requests" do
+    before do
+      Rack::RequestPolice.configure do |c|
+        c.method = [:patch]
+      end
+    end
+
     let(:app){
       Sinatra.new do
-        use(Rack::RequestPolice::Middleware, method: [:patch])
+        use(Rack::RequestPolice::Middleware)
         patch '/update' do
         end
       end
@@ -82,9 +99,15 @@ describe "My Middleware", type: :request do
   end
 
   context "logging DELETE requests" do
+    before do
+      Rack::RequestPolice.configure do |c|
+        c.method = [:delete]
+      end
+    end
+
     let(:app){
       Sinatra.new do
-        use(Rack::RequestPolice::Middleware, method: [:delete])
+        use(Rack::RequestPolice::Middleware)
         delete '/destroy' do
         end
       end
@@ -101,9 +124,15 @@ describe "My Middleware", type: :request do
   end
 
   context "logging requests via regex expression" do
+    before do
+      Rack::RequestPolice.configure do |c|
+        c.regex = /user/
+      end
+    end
+
     let(:app){
       Sinatra.new do
-        use(Rack::RequestPolice::Middleware, match: /user/)
+        use(Rack::RequestPolice::Middleware)
         get '/user' do
         end
         get '/account' do
@@ -128,9 +157,15 @@ describe "My Middleware", type: :request do
   end
 
   context "logging request via regex expression (with params)" do
+    before do
+      Rack::RequestPolice.configure do |c|
+        c.regex = /user\?id=1/
+      end
+    end
+
     let(:app){
       Sinatra.new do
-        use(Rack::RequestPolice::Middleware, match: /user\?id=1/)
+        use(Rack::RequestPolice::Middleware)
         get '/user' do
         end
       end
