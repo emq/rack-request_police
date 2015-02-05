@@ -4,9 +4,16 @@
     <title><%= environment_name %> RequestPolice</title>
     <link rel="stylesheet" type="text/css" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
     <style type="text/css">
-    pre {
+    tr.details {
       display: none;
     }
+    td.time, td.ip {
+      font-size: 80%;
+    }
+    td.method {
+      text-align: center;
+    }
+
     </style>
     <script type="text/javascript">
       function ready(fn){
@@ -21,11 +28,11 @@
         var elements = document.querySelectorAll('a');
           Array.prototype.forEach.call(elements, function(el){
           el.addEventListener('click', function(e){
-            var pre = this.nextSibling;
-            if (pre.style.display == 'block'){
-              pre.style.display ='none';
+            var row = document.getElementById(this.dataset.details);
+            if (row.style.display == 'table-row'){
+              row.style.display = 'none';
             } else {
-              pre.style.display = 'block';
+              row.style.display = 'table-row';
             }
             e.preventDefault();
           });
@@ -44,56 +51,68 @@
     <div class="container">
       <div class="row">
         <div class="col-md-12">
-          <table class="table table-striped">
-            <thead>
-              <tr>
-                <th>Method</th>
-                <th>Time</th>
-                <th>URL</th>
-                <th>Data</th>
-              </tr>
-            </thead>
-            <tbody>
-              <% @logs.each do |log| %>
-              <tr>
-                <td><span class="label label-<%= method_class log.method %>"><%= log.method %></span></td>
-                <td><%= log.time %></td>
-                <td><%= log.url %></td>
-                <td>
-                  <% if log.data.present? %>
-                    <a href='#'>details</a><pre>
-                      <%= log.data.inspect %>
-                    </pre>
-                  <% end %>
-                </td>
-              </tr>
-              <% end %>
-            </tbody>
-          </table>
+          <% if @logs.any? %>
+            <table class="table table-striped  table-hover">
+              <thead>
+                <tr>
+                  <th class="col-md-1">Method</th>
+                  <th class="col-md-2">Time</th>
+                  <th class="col-md-1">IP</th>
+                  <th class="col-md-5">URL</th>
+                  <th class="col-md-4">Data</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% @logs.each_with_index do |log, idx| %>
+                <tr>
+                  <td class="method"><span class="label label-<%= method_class log.method %>"><%= log.method %></span></td>
+                  <td class="time"><%= log.time %></td>
+                  <td class="ip"><%= log.ip %></td>
+                  <td><a href="<%= log.url %>" target="_blank"><%= log.url %></a></td>
+                  <td>
+                    <% if log.data %>
+                      <a href='#' data-details="details_<%= idx %>">toggle details</a></td>
+                      <tr class="details" id="details_<%= idx %>">
+                        <td colspan="5">
+                          <pre>
+                            <%= log.data.inspect %>
+                          </pre>
+                        </td>
+                      </tr>
+                    <% else %>
+                      </td>
+                    <% end %>
+                </tr>
+                <% end %>
+              </tbody>
+            </table>
 
-          <% if @total_size > @count %>
-            <ul class="pagination pull-right">
-              <li class="<%= 'disabled' if @current_page == 1 %>">
-                <a href="<%= root_path %>?page=1">&laquo;</a>
-              </li>
-              <% if @current_page > 1 %>
-                <li>
-                  <a href="<%= root_path %>?<%= qparams(page: @current_page - 1) %>"><%= @current_page - 1 %></a>
+            <% if @total_size > @count %>
+              <ul class="pagination pull-right">
+                <li class="<%= 'disabled' if @current_page == 1 %>">
+                  <a href="<%= root_path %>?page=1">&laquo;</a>
                 </li>
-              <% end %>
-              <li class="disabled">
-                <a href="<%= root_path %>?<%= qparams(page: @current_page) %>"><%= @current_page %></a>
-              </li>
-              <% if @total_size > @current_page * @count %>
-                <li>
-                  <a href="<%= root_path %>?<%= qparams(page: @current_page + 1) %>"><%= @current_page + 1 %></a>
+                <% if @current_page > 1 %>
+                  <li>
+                    <a href="<%= root_path %>?<%= qparams(page: @current_page - 1) %>"><%= @current_page - 1 %></a>
+                  </li>
+                <% end %>
+                <li class="disabled">
+                  <a href="<%= root_path %>?<%= qparams(page: @current_page) %>"><%= @current_page %></a>
                 </li>
-              <% end %>
-              <li class="<%= 'disabled' if @total_size <= @current_page * @count %>">
-                <a href="<%= root_path %>?<%= qparams(page: (@total_size.to_f / @count).ceil) %>">&raquo;</a>
-              </li>
-            </ul>
-          <% end %>
+                <% if @total_size > @current_page * @count %>
+                  <li>
+                    <a href="<%= root_path %>?<%= qparams(page: @current_page + 1) %>"><%= @current_page + 1 %></a>
+                  </li>
+                <% end %>
+                <li class="<%= 'disabled' if @total_size <= @current_page * @count %>">
+                  <a href="<%= root_path %>?<%= qparams(page: (@total_size.to_f / @count).ceil) %>">&raquo;</a>
+                </li>
+              </ul>
+            <% end %>
+          <% else %>
+          <div class="alert alert-info">No requests logged</div>
+        <% end %>
         </div>
       </div>
     </div>

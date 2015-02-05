@@ -2,7 +2,7 @@ require 'coveralls'
 Coveralls.wear!
 
 require_relative '../lib/rack/request_police'
-require 'sinatra/base'
+require_relative '../lib/rack/request_police/web'
 require 'rack/test'
 require 'timecop'
 require 'redis'

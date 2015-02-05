@@ -6,7 +6,7 @@ describe "Simple benchmark", type: :request do
   context "with middleware (defaults)" do
     let(:app){
       Sinatra.new do
-        use(Rack::RequestPolice::Middleware, storage: DummyStorage.new)
+        use(Rack::RequestPolice::Middleware)
         get '/' do
         end
         post '/' do
@@ -20,6 +20,7 @@ describe "Simple benchmark", type: :request do
 
     it "benchmarks it" do
       puts "with middleware (defaults)"
+      Rack::RequestPolice.storage = DummyStorage.new
       Benchmark.bm(7) do |x|
         x.report("get") { repeat.times { get '/' } }
         x.report("post") { repeat.times { post '/' } }
@@ -32,7 +33,7 @@ describe "Simple benchmark", type: :request do
   context "with middleware (customized)" do
     let(:app){
       Sinatra.new do
-        use(Rack::RequestPolice::Middleware, storage: DummyStorage.new, method: [:get, :post, :delete], matching: /.*/)
+        use(Rack::RequestPolice::Middleware, method: [:get, :post, :delete], matching: /.*/)
         get '/' do
         end
         post '/' do
@@ -46,6 +47,7 @@ describe "Simple benchmark", type: :request do
 
     it "benchmarks it" do
       puts "with middleware (customized)"
+      Rack::RequestPolice.storage = DummyStorage.new
       Benchmark.bm(7) do |x|
         x.report("get") { repeat.times { get '/' } }
         x.report("post") { repeat.times { post '/' } }
@@ -61,7 +63,7 @@ describe "Simple benchmark", type: :request do
 
     let!(:app){
       Sinatra.new do
-        use(Rack::RequestPolice::Middleware, storage: Rack::RequestPolice::Storage::Redis.new(REDIS_OPTIONS), method: [:get, :post, :delete], matching: /.*/)
+        use(Rack::RequestPolice::Middleware, method: [:get, :post, :delete], matching: /.*/)
         get '/' do
         end
         post '/' do
@@ -75,6 +77,7 @@ describe "Simple benchmark", type: :request do
 
     it "benchmarks it" do
       puts "with middleware (customized, redis storage)"
+      Rack::RequestPolice.storage = Rack::RequestPolice::Storage::Redis.new(REDIS_OPTIONS)
       Benchmark.bm(7) do |x|
         x.report("get") { repeat.times { get '/' } }
         x.report("post") { repeat.times { post '/' } }
@@ -90,7 +93,7 @@ describe "Simple benchmark", type: :request do
 
     let(:app){
       Sinatra.new do
-        use(Rack::RequestPolice::Middleware, storage: Rack::RequestPolice::Storage::Redis.new(REDIS_OPTIONS, json_parser: Oj), method: [:get, :post, :delete], matching: /.*/)
+        use(Rack::RequestPolice::Middleware, method: [:get, :post, :delete], matching: /.*/)
         get '/' do
         end
         post '/' do
@@ -104,6 +107,7 @@ describe "Simple benchmark", type: :request do
 
     it "benchmarks it" do
       puts "with middleware (customized, redis storage, OJ parser)"
+      Rack::RequestPolice.storage = Rack::RequestPolice::Storage::Redis.new(REDIS_OPTIONS, json_parser: Oj)
       Benchmark.bm(7) do |x|
         x.report("get") { repeat.times { get '/' } }
         x.report("post") { repeat.times { post '/' } }

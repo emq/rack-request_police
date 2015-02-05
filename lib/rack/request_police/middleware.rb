@@ -7,7 +7,6 @@ module Rack
         @app = app
         @method = options[:method] || [:get, :post, :delete, :patch]
         @regex = options[:match]
-        @storage = ::Rack::RequestPolice.storage
       end
 
       def call(env)
@@ -29,7 +28,7 @@ module Rack
             if %w(POST PATCH DELETE).include?(env['REQUEST_METHOD'])
               request_params.merge!('data' => env['rack.input'].gets)
             end
-            @storage.log_request(request_params)
+            ::Rack::RequestPolice.storage.log_request(request_params)
           end
         end
 

@@ -8,6 +8,7 @@ require "rack/request_police/middleware"
 module Rack
   module RequestPolice
     class NoStorageFound < StandardError; end
+    @@storage = nil
 
     def self.storage=(obj)
       @@storage = obj
