@@ -23,7 +23,7 @@ module Rack
             }
 
             if %w(POST PATCH DELETE).include?(env['REQUEST_METHOD'])
-              request_params.merge!('data' => env['rack.input'].gets)
+              request_params.merge!('data' => env['rack.input'].read)
             end
             ::Rack::RequestPolice.storage.log_request(request_params)
           end
