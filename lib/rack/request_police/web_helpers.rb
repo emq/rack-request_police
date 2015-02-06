@@ -29,6 +29,10 @@ module Rack
       def root_path
         "#{env['SCRIPT_NAME']}/"
       end
+
+      def escape(text)
+         ::Rack::Utils.escape_html(text)
+      end
     end
   end
 end
