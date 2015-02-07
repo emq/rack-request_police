@@ -3,6 +3,7 @@
 [![Code Climate](https://codeclimate.com/github/emq/rack-request_police/badges/gpa.svg)](https://codeclimate.com/github/emq/rack-request_police)
 [![Build Status](https://travis-ci.org/emq/rack-request_police.svg)](https://travis-ci.org/emq/rack-request_police)
 [![Coverage Status](https://coveralls.io/repos/emq/rack-request_police/badge.svg)](https://coveralls.io/r/emq/rack-request_police)
+[![Gem Version](https://badge.fury.io/rb/rack-request_police.svg)](http://badge.fury.io/rb/rack-request_police)
 [![Dependency Status](https://gemnasium.com/emq/rack-request_police.svg)](https://gemnasium.com/emq/rack-request_police)
 
 Rack middleware for logging selected request for further investigation / analyze.
