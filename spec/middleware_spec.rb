@@ -22,7 +22,7 @@ describe "My Middleware", type: :request do
     }
 
     it "logs request without query params" do
-      expect_any_instance_of(DummyStorage).to receive(:log_request)
+      expect(Rack::RequestPolice.storage).to receive(:log_request)
         .with('url' => "http://example.org/", 'ip' => "127.0.0.1", 'method' => "get", 'time' => Time.now.to_i)
 
       get '/'
@@ -31,10 +31,19 @@ describe "My Middleware", type: :request do
     end
 
     it "logs request with query params" do
-      expect_any_instance_of(DummyStorage).to receive(:log_request)
+      expect(Rack::RequestPolice.storage).to receive(:log_request)
         .with('url' => "http://example.org/?what-the&hell=", 'ip' => "127.0.0.1", 'method' => "get", 'time' => Time.now.to_i)
 
       get '/?what-the&hell='
+
+      expect(last_response.status).to eq 200
+    end
+
+    it "logs ip address from HTTP_X_FORWARDED_FOR header if avaiable" do
+      expect(Rack::RequestPolice.storage).to receive(:log_request)
+        .with('url' => "http://example.org/", 'ip' => "1.2.3.4", 'method' => "get", 'time' => Time.now.to_i)
+
+      get '/', nil, { 'HTTP_X_FORWARDED_FOR' => '1.2.3.4' }
 
       expect(last_response.status).to eq 200
     end
@@ -58,13 +67,13 @@ describe "My Middleware", type: :request do
     }
 
     it "ignores get requests" do
-      expect_any_instance_of(DummyStorage).not_to receive(:log_request)
+      expect(Rack::RequestPolice.storage).not_to receive(:log_request)
       get '/'
       expect(last_response.status).to eq 200
     end
 
     it "logs post request with request data" do
-      expect_any_instance_of(DummyStorage).to receive(:log_request)
+      expect(Rack::RequestPolice.storage).to receive(:log_request)
         .with('url' => "http://example.org/form", 'ip' => "127.0.0.1", 'method' => "post", 'time' => Time.now.to_i, 'data' => 'user[name]=john&user[email]=john%40test.com')
 
       post '/form', { user: { name: 'john', email: 'john@test.com' } }
@@ -89,7 +98,7 @@ describe "My Middleware", type: :request do
     }
 
     it "logs patch request with request data" do
-      expect_any_instance_of(DummyStorage).to receive(:log_request)
+      expect(Rack::RequestPolice.storage).to receive(:log_request)
         .with('url' => "http://example.org/update", 'ip' => "127.0.0.1", 'method' => "patch", 'time' => Time.now.to_i, 'data' => 'user[name]=john')
 
       patch '/update', { user: { name: 'john' } }
@@ -114,7 +123,7 @@ describe "My Middleware", type: :request do
     }
 
     it "logs delete request with request data" do
-      expect_any_instance_of(DummyStorage).to receive(:log_request)
+      expect(Rack::RequestPolice.storage).to receive(:log_request)
         .with('url' => "http://example.org/destroy", 'ip' => "127.0.0.1", 'method' => "delete", 'time' => Time.now.to_i, 'data' => 'user[id]=1')
 
       delete '/destroy', { user: { id: 1 } }
@@ -141,13 +150,13 @@ describe "My Middleware", type: :request do
     }
 
     it "ignores queries that does not match given regex" do
-      expect_any_instance_of(DummyStorage).not_to receive(:log_request)
+      expect(Rack::RequestPolice.storage).not_to receive(:log_request)
       get '/account'
       expect(last_response.status).to eq 200
     end
 
     it "logs matching queries" do
-      expect_any_instance_of(DummyStorage).to receive(:log_request)
+      expect(Rack::RequestPolice.storage).to receive(:log_request)
         .with('url' => "http://example.org/user", 'ip' => "127.0.0.1", 'method' => "get", 'time' => Time.now.to_i)
 
       get '/user'
@@ -172,13 +181,13 @@ describe "My Middleware", type: :request do
     }
 
     it "ignores queries that does not match given regex" do
-      expect_any_instance_of(DummyStorage).not_to receive(:log_request)
+      expect(Rack::RequestPolice.storage).not_to receive(:log_request)
       get '/user?id=2'
       expect(last_response.status).to eq 200
     end
 
     it "logs matching queries" do
-      expect_any_instance_of(DummyStorage).to receive(:log_request)
+      expect(Rack::RequestPolice.storage).to receive(:log_request)
         .with('url' => "http://example.org/user?id=1", 'ip' => "127.0.0.1", 'method' => "get", 'time' => Time.now.to_i)
 
       get '/user?id=1'

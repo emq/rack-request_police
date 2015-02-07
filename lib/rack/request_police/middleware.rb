@@ -17,7 +17,7 @@ module Rack
           if !::Rack::RequestPolice.regex || full_url =~ ::Rack::RequestPolice.regex
             request_params = {
               'url'    => full_url,
-              'ip'     => env['REMOTE_ADDR'],
+              'ip'     => ip_address(env),
               'method' => env['REQUEST_METHOD'].downcase,
               'time'   => Time.now.to_i
             }
@@ -30,6 +30,16 @@ module Rack
         end
 
         @app.call(env)
+      end
+
+      private
+
+      def ip_address(env)
+        if !env['HTTP_X_FORWARDED_FOR'] || env['HTTP_X_FORWARDED_FOR'].empty?
+          env['REMOTE_ADDR']
+        else
+          env['HTTP_X_FORWARDED_FOR']
+        end
       end
     end
   end
