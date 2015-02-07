@@ -75,7 +75,7 @@
                       <tr class="details" id="details_<%= idx %>">
                         <td colspan="5">
                           <pre>
-                            <%= escape(log.data.inspect) %>
+                            <%= escape(parse_post_data(log.data)) %>
                           </pre>
                         </td>
                       </tr>
