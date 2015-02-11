@@ -23,7 +23,7 @@ module Rack
             }
 
             if %w(POST PATCH DELETE).include?(env['REQUEST_METHOD'])
-              request_params.merge!('data' => env['rack.input'].read)
+              request_params.merge!('data' => utf8_input(env))
             end
             ::Rack::RequestPolice.storage.log_request(request_params)
           end
@@ -33,6 +33,12 @@ module Rack
       end
 
       private
+
+      def utf8_input(env)
+        env['rack.input'].read
+          .force_encoding('utf-8')
+          .encode('utf-8', 'utf-8', invalid: :replace, replace: '')
+      end
 
       def ip_address(env)
         if !env['HTTP_X_FORWARDED_FOR'] || env['HTTP_X_FORWARDED_FOR'].empty?
