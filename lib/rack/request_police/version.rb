@@ -1,5 +1,5 @@
 module Rack
   module RequestPolice
-    VERSION = "0.0.4alpha"
+    VERSION = "0.1.0alpha"
   end
 end

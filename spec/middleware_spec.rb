@@ -8,6 +8,7 @@ describe "My Middleware", type: :request do
       c.storage = DummyStorage.new
       c.regex = nil
       c.method = [:get, :post, :delete, :patch]
+      c.headers = []
     end
   end
   after  { Timecop.return }
@@ -52,6 +53,8 @@ describe "My Middleware", type: :request do
   context "logging only POST requests" do
     before do
       Rack::RequestPolice.configure do |c|
+        c.regex = nil
+        c.headers = []
         c.method = [:post]
       end
     end
@@ -85,6 +88,8 @@ describe "My Middleware", type: :request do
   context "logging PATCH requests" do
     before do
       Rack::RequestPolice.configure do |c|
+        c.regex = nil
+        c.headers = []
         c.method = [:patch]
       end
     end
@@ -110,6 +115,8 @@ describe "My Middleware", type: :request do
   context "logging DELETE requests" do
     before do
       Rack::RequestPolice.configure do |c|
+        c.regex = nil
+        c.headers = []
         c.method = [:delete]
       end
     end
@@ -136,6 +143,7 @@ describe "My Middleware", type: :request do
     before do
       Rack::RequestPolice.configure do |c|
         c.regex = /user/
+        c.headers = []
       end
     end
 
@@ -169,6 +177,7 @@ describe "My Middleware", type: :request do
     before do
       Rack::RequestPolice.configure do |c|
         c.regex = /user\?id=1/
+        c.headers = []
       end
     end
 
@@ -211,6 +220,103 @@ describe "My Middleware", type: :request do
 
     it 'raises an error' do
       expect { get '/' }.to raise_error(Rack::RequestPolice::NoStorageFound)
+    end
+  end
+
+  context "logging request with custom headers - headers exists" do
+    let(:app){
+      Sinatra.new do
+        use(Rack::RequestPolice::Middleware)
+        get '/user' do
+        end
+      end
+    }
+
+    context 'request contains requested headers' do
+      before do
+        Rack::RequestPolice.configure do |c|
+          c.storage = DummyStorage.new
+          c.regex = nil
+
+          c.headers = [
+            "HTTP_MY_HEADER"
+          ]
+        end
+      end
+
+      it "logs header as it is" do
+        expect(Rack::RequestPolice.storage).to receive(:log_request)
+          .with({
+          "url"=>"http://example.org/user",
+          "ip"=>"127.0.0.1",
+          "method"=>"get",
+          "time"=>Time.now.to_i,
+          "HTTP_MY_HEADER" => "MY%HEADER%VALUE"
+        })
+
+        get '/user', {}, { 'HTTP_MY_HEADER' => 'MY%HEADER%VALUE' }
+
+        expect(last_response.status).to eq 200
+      end
+    end
+
+    context 'request contains requested headers + custom storage name + transformation' do
+      before do
+        Rack::RequestPolice.configure do |c|
+          c.storage = DummyStorage.new
+          c.regex = nil
+
+          c.headers = [
+            c.header("HTTP_MY_HEADER", storage_name: 'my_header') { |h| h.downcase.gsub('%', '_')}
+          ]
+        end
+      end
+
+      it "logs header as custom name and transforms it" do
+        expect(Rack::RequestPolice.storage).to receive(:log_request)
+          .with({
+          "url"=>"http://example.org/user",
+          "ip"=>"127.0.0.1",
+          "method"=>"get",
+          "time"=>Time.now.to_i,
+          "my_header"=>"my_header_value"
+        })
+
+        get '/user', {}, { 'HTTP_MY_HEADER' => 'MY%HEADER%VALUE' }
+
+        expect(last_response.status).to eq 200
+      end
+    end
+
+    context "headers do not exists in request but fallback value is provided" do
+      before do
+        Rack::RequestPolice.configure do |c|
+          c.storage = DummyStorage.new
+          c.regex = nil
+
+          c.headers = [
+            c.header("HTTP_MY_HEADER",
+                     storage_name: 'my_header',
+                     fallback_value: 'HEADER_MISSING')  \
+            { |h| h.downcase.gsub('%', '_') }
+          ]
+        end
+      end
+
+      it "logs headers" do
+        expect(Rack::RequestPolice.storage).to receive(:log_request)
+          .with({
+          "url"=>"http://example.org/user",
+          "ip"=>"127.0.0.1",
+          "method"=>"get",
+          "time"=>Time.now.to_i,
+          'my_header' => 'HEADER_MISSING'
+        })
+
+        get '/user', {}, {}
+
+        expect(last_response.status).to eq 200
+      end
     end
   end
 end
