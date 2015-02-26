@@ -12,6 +12,7 @@ Features:
 
 - filter requests by method (get/post/patch/delete) and/or regular expression
 - log requests into storage of your choice (at the moment redis supported)
+- choose what headers you want to store and transform them if you want to
 
 Work in progress.
 
@@ -60,6 +61,32 @@ Rack::RequestPolice.configure do |config|
   # array of methods that should be logged (all four by default)
   # requests not included in this list will be ignored
   config.method = [:get, :post, :delete, :patch]
+
+  # array of headers that you want to store for each request (empty by default)
+  config.headers = [
+    "HTTP_HEADER_NAME",
+    "HTTP_ANOTHER_HEADER_NAME"
+  ]
+
+  # each item in headers array can be also defined using helper method config.header
+  #
+  # @param original_header_name is required and it is a name of original header
+  #
+  # options:
+  # storage_name - name of under which http header will be stored, default - original_header_name
+  # fallback_value - value of header that will be logged if header is missing, default - nil
+  #
+  # @block - optional transformations of the header before it is stored
+  #
+  # Example:
+  # config.headers = [
+  #   config.header("HTTP_HEADER_NAME",
+  #     storage_name: 'HEADER_NAME',
+  #     fallback_value: 'HEADER_IS_MISSING'
+  #   ) { |header| header.downcase },
+  #   config.header("HTTP_ANOTHER_HEADER_NAME"),
+  #   config.header("HTTP_ANOTHER_FANCY_HEADER", storage_name: 'fancy_header')
+  # ]
 end
 ```
 
