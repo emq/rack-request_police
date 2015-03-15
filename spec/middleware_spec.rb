@@ -219,7 +219,8 @@ describe "My Middleware", type: :request do
     }
 
     it 'raises an error' do
-      expect { get '/' }.to raise_error(Rack::RequestPolice::NoStorageFound)
+      get '/'
+      expect(last_response.status).to eq 500
     end
   end
 
