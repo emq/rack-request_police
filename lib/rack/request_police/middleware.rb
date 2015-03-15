@@ -26,23 +26,7 @@ module Rack
               request_params.merge!('data' => utf8_input(env))
             end
 
-            headers = Rack::RequestPolice.headers.inject({}) do |result, header_hash|
-              header_name = header_hash.fetch(:original_header_name)
-              transformation = header_hash.fetch(:transformation)
-
-              fallback_value = header_hash.fetch(:fallback_value)
-              storage_name = header_hash.fetch(:storage_name)
-
-              header_value = env[header_name]
-              # apply transformations to header_value, fail silently on any exception
-              header_value = transformation.call(header_value) rescue header_value
-              # if header_value is nil, assign fallback value
-              header_value = header_value || fallback_value
-
-              result.merge({storage_name => header_value})
-            end
-
-            request_params.merge!(headers)
+            request_params.merge!(request_headers(env))
 
             ::Rack::RequestPolice.storage.log_request(request_params)
           end
@@ -52,6 +36,22 @@ module Rack
       end
 
       private
+
+      def request_headers(env)
+        Rack::RequestPolice.headers.each_with_object({}) do |header_hash, result|
+          header_name    = header_hash.fetch(:original_header_name)
+          transformation = header_hash.fetch(:transformation)
+
+          fallback_value = header_hash.fetch(:fallback_value)
+          storage_name   = header_hash.fetch(:storage_name)
+
+          header_value = env[header_name]
+          header_value = transformation.call(header_value) if header_value
+          header_value ||= fallback_value
+
+          result[storage_name] = header_value
+        end
+      end
 
       def utf8_input(env)
         env['rack.input'].read
