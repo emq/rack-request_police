@@ -17,6 +17,7 @@ describe "My Middleware", type: :request do
   context "logging all requests" do
     let(:app){
       Sinatra.new do
+        set :show_exceptions, false
         use(Rack::RequestPolice::Middleware)
         get '/' do
         end
@@ -62,6 +63,7 @@ describe "My Middleware", type: :request do
 
     let(:app){
       Sinatra.new do
+        set :show_exceptions, false
         use(Rack::RequestPolice::Middleware)
         get '/' do
         end
@@ -97,6 +99,7 @@ describe "My Middleware", type: :request do
 
     let(:app){
       Sinatra.new do
+        set :show_exceptions, false
         use(Rack::RequestPolice::Middleware)
         patch '/update' do
         end
@@ -124,6 +127,7 @@ describe "My Middleware", type: :request do
 
     let(:app){
       Sinatra.new do
+        set :show_exceptions, false
         use(Rack::RequestPolice::Middleware)
         delete '/destroy' do
         end
@@ -150,6 +154,7 @@ describe "My Middleware", type: :request do
 
     let(:app){
       Sinatra.new do
+        set :show_exceptions, false
         use(Rack::RequestPolice::Middleware)
         get '/user' do
         end
@@ -184,6 +189,7 @@ describe "My Middleware", type: :request do
 
     let(:app){
       Sinatra.new do
+        set :show_exceptions, false
         use(Rack::RequestPolice::Middleware)
         get '/user' do
         end
@@ -215,19 +221,20 @@ describe "My Middleware", type: :request do
 
     let(:app){
       Sinatra.new do
+        set :show_exceptions, false
         use(Rack::RequestPolice::Middleware)
       end
     }
 
     it 'raises an error' do
-      get '/'
-      expect(last_response.status).to eq 500
+      expect { get '/' }.to raise_error(Rack::RequestPolice::NoStorageFound)
     end
   end
 
   context "logging request with custom headers" do
     let(:app){
       Sinatra.new do
+        set :show_exceptions, false
         use(Rack::RequestPolice::Middleware)
         get '/user' do
         end
