@@ -74,15 +74,23 @@
                       <a href='#' data-details="details_<%= idx %>">toggle details</a></td>
                       <tr class="details" id="details_<%= idx %>">
                         <td colspan="5">
-                          <h4>Data:</h4>
-                          <pre>
-                            <%= escape(pretty_parse(log.data)) %>
-                          </pre>
+                          <% if log.data %>
+                            <h4>Data:</h4>
+                            <pre>
+                              <%= escape(pretty_parse(log.data)) %>
+                            </pre>
+                          <% end %>
 
-                          <h4>Headers:</h4>
-                          <pre>
-                            <%= escape(pretty_parse(log.headers)) %>
-                          </pre>
+                          <% if log.headers %>
+                            <h4>Headers:</h4>
+                            <pre>
+                              <%= escape(pretty_parse(log.headers)) %>
+                            </pre>
+                          <% end %>
+
+                          <% if !log.data && !log.headers %>
+                            <h4>No data / headers logged.</h4>
+                          <% end %>
                         </td>
                       </tr>
                     <% else %>
