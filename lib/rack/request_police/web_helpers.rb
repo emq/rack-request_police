@@ -34,7 +34,7 @@ module Rack
          ::Rack::Utils.escape_html(text)
       end
 
-      def parse_post_data(post_data)
+      def pretty_parse(post_data)
         JSON.pretty_generate(JSON.parse(post_data))
       rescue JSON::ParserError
         post_data

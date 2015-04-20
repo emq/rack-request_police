@@ -74,8 +74,14 @@
                       <a href='#' data-details="details_<%= idx %>">toggle details</a></td>
                       <tr class="details" id="details_<%= idx %>">
                         <td colspan="5">
+                          <h4>Data:</h4>
                           <pre>
-                            <%= escape(parse_post_data(log.data)) %>
+                            <%= escape(pretty_parse(log.data)) %>
+                          </pre>
+
+                          <h4>Headers:</h4>
+                          <pre>
+                            <%= escape(pretty_parse(log.headers)) %>
                           </pre>
                         </td>
                       </tr>
