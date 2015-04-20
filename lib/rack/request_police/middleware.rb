@@ -26,7 +26,8 @@ module Rack
               request_params.merge!('data' => utf8_input(env))
             end
 
-            request_params.merge!(request_headers(env))
+            headers = request_headers(env)
+            request_params.merge!('headers' => headers) unless headers.empty?
 
             ::Rack::RequestPolice.storage.log_request(request_params)
           end
@@ -49,7 +50,7 @@ module Rack
           header_value = transformation.call(header_value) if header_value
           header_value ||= fallback_value
 
-          result[storage_name] = header_value
+          result[storage_name] = header_value if header_value
         end
       end
 

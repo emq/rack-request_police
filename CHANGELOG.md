@@ -1,3 +1,8 @@
+## Unreleased
+
+- store logged headers under `headers` key (see `Storage::Unit`)
+- don't log not-existing headers unless _truthy_ fallback value is provided
+
 ## 0.0.5alpha
 
 - log specified headers feature (backend) #3 (@michaldarda)

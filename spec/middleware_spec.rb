@@ -260,7 +260,7 @@ describe "My Middleware", type: :request do
           "ip" => "127.0.0.1",
           "method" => "get",
           "time" => Time.now.to_i,
-          "HTTP_MY_HEADER" => "MY%HEADER%VALUE"
+          "headers" => { "HTTP_MY_HEADER" => "MY%HEADER%VALUE" }
         })
 
         get '/user', {}, { 'HTTP_MY_HEADER' => 'MY%HEADER%VALUE' }
@@ -288,7 +288,7 @@ describe "My Middleware", type: :request do
           "ip" => "127.0.0.1",
           "method" => "get",
           "time" => Time.now.to_i,
-          "my_header" => "my_header_value"
+          "headers" => { "my_header" => "my_header_value" }
         })
 
         get '/user', {}, { 'HTTP_MY_HEADER' => 'MY%HEADER%VALUE' }
@@ -319,7 +319,7 @@ describe "My Middleware", type: :request do
           "ip" => "127.0.0.1",
           "method" => "get",
           "time" => Time.now.to_i,
-          'my_header' => 'HEADER_MISSING'
+          "headers" => { 'my_header' => 'HEADER_MISSING' }
         })
 
         get '/user', {}, {}
@@ -340,14 +340,13 @@ describe "My Middleware", type: :request do
         end
       end
 
-      it "logs header as custom name and transforms it" do
+      it "ignores not existing header" do
         expect(Rack::RequestPolice.storage).to receive(:log_request)
           .with({
           "url" => "http://example.org/user",
           "ip" => "127.0.0.1",
           "method" => "get",
-          "time" => Time.now.to_i,
-          "my_header" => nil
+          "time" => Time.now.to_i
         })
 
         get '/user', {}
@@ -375,7 +374,7 @@ describe "My Middleware", type: :request do
           "ip" => "127.0.0.1",
           "method" => "get",
           "time" => Time.now.to_i,
-          "my_header" => 'not found'
+          "headers" => { "my_header" => 'not found' }
         })
 
         get '/user', {}
@@ -396,17 +395,46 @@ describe "My Middleware", type: :request do
         end
       end
 
-      it "logs header as custom name and falls-back to default value" do
+      it "ignores not existing header" do
+        expect(Rack::RequestPolice.storage).to receive(:log_request)
+          .with({
+          "url" => "http://example.org/user",
+          "ip" => "127.0.0.1",
+          "method" => "get",
+          "time" => Time.now.to_i
+        })
+
+        get '/user', {}
+
+        expect(last_response.status).to eq 200
+      end
+    end
+
+    context 'logging multiple headers' do
+      before do
+        Rack::RequestPolice.configure do |c|
+          c.storage = DummyStorage.new
+          c.regex = nil
+
+          c.headers = [
+            'HTTP_HEADER_1',
+            'HTTP_HEADER_2',
+            'HTTP_HEADER_3'
+          ]
+        end
+      end
+
+      it 'logs all declared headers' do
         expect(Rack::RequestPolice.storage).to receive(:log_request)
           .with({
           "url" => "http://example.org/user",
           "ip" => "127.0.0.1",
           "method" => "get",
           "time" => Time.now.to_i,
-          "HTTP_MY_HEADER" => nil
+          "headers" => { 'HTTP_HEADER_1' => "one", 'HTTP_HEADER_3' => 'two' }
         })
 
-        get '/user', {}
+        get '/user', {}, { 'HTTP_HEADER_1' => 'one', 'HTTP_HEADER_3' => 'two' }
 
         expect(last_response.status).to eq 200
       end

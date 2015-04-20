@@ -26,7 +26,7 @@ module Rack
           total_size = redis.llen(REDIS_KEY)
           items      = redis.lrange(REDIS_KEY, starting, ending).map do |json|
             hash = parser.load(json)
-            Unit.new(hash['method'], hash['ip'], hash['url'], Time.at(hash['time']), hash['data'])
+            Unit.new(hash['method'], hash['ip'], hash['url'], Time.at(hash['time']), hash['data'], hash['headers'])
           end
 
           [current_page, total_size, items]
