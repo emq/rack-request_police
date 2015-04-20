@@ -74,7 +74,8 @@ Rack::RequestPolice.configure do |config|
   #
   # options:
   # storage_name - name of under which http header will be stored, default - original_header_name
-  # fallback_value - value of header that will be logged if header is missing, default - nil
+  # fallback_value - truthy value of header that will be logged if header is missing
+  #                  (missing headers are not logged by default)
   #
   # @block - optional transformations of the header before it is stored
   #
