@@ -36,8 +36,14 @@ module Rack
 
       def pretty_parse(post_data)
         JSON.pretty_generate(JSON.parse(post_data))
-      rescue JSON::ParserError
+      rescue JSON::ParserError, JSON::GeneratorError
         post_data
+      end
+
+      def pretty_parse_hash(hash)
+        JSON.pretty_generate(hash)
+      rescue JSON::GeneratorError
+        hash.to_s
       end
     end
   end

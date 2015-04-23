@@ -1,3 +1,7 @@
+## 0.1.0alpha2
+
+- web ui parse headers fix
+
 ## 0.1.0alpha
 
 **Backward incompatible changes**

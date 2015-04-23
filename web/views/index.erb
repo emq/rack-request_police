@@ -84,7 +84,7 @@
                           <% if log.headers %>
                             <h4>Headers:</h4>
                             <pre>
-                              <%= escape(pretty_parse(log.headers)) %>
+                              <%= escape(pretty_parse_hash(log.headers)) %>
                             </pre>
                           <% end %>
 
